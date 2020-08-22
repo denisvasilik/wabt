@@ -327,6 +327,8 @@ set(WABT_LIBRARY_SRC
   src/utf8.cc
   src/validator.h
   src/validator.cc
+  src/wasm-module.h
+  src/wasm-module.cc
   src/wast-lexer.h
   src/wast-lexer.cc
   src/wast-parser.h
