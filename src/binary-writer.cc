@@ -31,6 +31,7 @@
 #include "src/leb128.h"
 #include "src/stream.h"
 #include "src/string-view.h"
+#include "src/wasm-module.h"
 
 #define PRINT_HEADER_NO_INDEX -1
 #define MAX_U32_LEB128_BYTES 5
@@ -253,10 +254,16 @@ void BinaryWriter::WriteSectionHeader(const char* desc,
   assert(last_section_leb_size_guess_ == 0);
   WriteHeader(desc, PRINT_HEADER_NO_INDEX);
   stream_->WriteU8Enum(section_code, "section code");
+
+    if(section_code == BinarySection::Import) {
+        last_section_leb_size_guess_ = wabt::GetSectionSize(module_, section_code);
+    } else {
+        last_section_leb_size_guess_ = LEB_SECTION_SIZE_GUESS;
+    }
+
   last_section_type_ = section_code;
-  last_section_leb_size_guess_ = LEB_SECTION_SIZE_GUESS;
-  last_section_offset_ =
-      WriteU32Leb128Space(LEB_SECTION_SIZE_GUESS, "section size (guess)");
+  WriteU32Leb128(stream_, last_section_leb_size_guess_, "section size (guess)");
+  last_section_offset_ = stream_->offset();
   last_section_payload_offset_ = stream_->offset();
 }
 
